@@ -1,12 +1,12 @@
 # Nebra Helium Sync Estimate
 
-Monitor progress and estimate time until blockchain sync for Helium Nebra Hotspot Miner
+Monitor progress and estimate time until blockchain sync for Helium Nebra Hotspot Miner. Checks every 2 minutes for updates!
 
 ---
 ## Requirements
 
 ### Hotspot IP Address
- - Note the IP address of your hotspot on your network.
+ - Note the IP address of your hotspot on your network. Example: 192.168.1.200
 
 ### Node
 - #### Node installation on Windows
@@ -55,6 +55,11 @@ In order to run the app you must pass in your Nebra Hotspot's IP address:
 
 ## Results
 ```bash
+$ npm run start 192.168.1.200
+
+> nebra-helium-sync-estimate@1.0.0 start
+> node app.js "192.168.1.200"
+
 ==================== Nebra Helium Miner Sync Estimate ====================
 [2021-08-15T12:08:10-07:00]  Host: 192.168.1.200
 [2021-08-15T12:08:10-07:00]  Reading from existing saved data...
