@@ -6,7 +6,7 @@ Monitor progress and estimate time until blockchain sync for Helium Nebra Hotspo
 ## Requirements
 
 ### Hotspot IP Address
- - Note the IP address of your hotspot on your network.
+ - Note the IP address of your hotspot on your network. Example: 192.168.1.200
 
 ### Node
 - #### Node installation on Windows
