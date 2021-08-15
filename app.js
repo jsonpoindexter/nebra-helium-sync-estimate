@@ -63,15 +63,7 @@ async function init() {
     yellow('Block Height:'),
     green(prevBlockHeight),
   );
-  console.log(
-    timestamp(),
-    yellow('Average Mined Blocks:'),
-    green(averageMinedPerSecond),
-    yellow('/s'),
-    yellow('Average Added Blocks:'),
-    green(averageAddedPerSecond),
-    yellow('/s'),
-  );
+  showTrackedAverages();
 }
 
 async function checkResults() {
@@ -85,12 +77,12 @@ async function checkResults() {
     const remainingBlocks = currentBlockHeight - currentMinedHeight
     const elapseTime = timeMs - prevMinedTime  // Elapse time in seconds
     const blocksMinedPerMinute = ((elapseMinedBlocks / elapseTime) * 1000 * 60).toFixed(2)
-    averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond, (elapseMinedBlocks / elapseTime) * 1000)
+    averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond || (elapseMinedBlocks / elapseTime) * 1000 , (elapseMinedBlocks / elapseTime) * 1000)
     const blocksAddedPerMinute = ((elapseBlockHeight / elapseTime) * 1000 * 60).toFixed(2) // Blocks being added to height
-    averageAddedPerSecond = approxRollingAverage(averageAddedPerSecond, (elapseBlockHeight / elapseTime) * 1000)
+    averageAddedPerSecond = approxRollingAverage(averageAddedPerSecond || (elapseBlockHeight / elapseTime) * 1000, (elapseBlockHeight / elapseTime) * 1000)
 
     const {days, hours, minutes, seconds} = getTimeRemaining(
-      (elapseTime / (elapseMinedBlocks - elapseBlockHeight)) * remainingBlocks,
+      remainingBlocks / ((averageMinedPerSecond - averageAddedPerSecond) / 1000)
     )
     console.log(cyan(`==================== UPDATE ====================`))
 
@@ -112,6 +104,8 @@ async function checkResults() {
       green(elapseBlockHeight),
       yellow('blocks added to block height '),
     )
+
+    showTrackedAverages();
 
     console.log(
       timestamp(),
@@ -177,4 +171,16 @@ function approxRollingAverage(avg, newValue) {
   avg -= avg / averageOver
   avg += newValue / averageOver
   return avg
+}
+
+function showTrackedAverages() {
+  console.log(
+    timestamp(),
+    yellow('Average Mined Blocks:'),
+    green((averageMinedPerSecond * 60).toFixed(2)),
+    yellow('/m'),
+    yellow('Average Added Blocks:'),
+    green((averageAddedPerSecond * 60).toFixed(2)),
+    yellow('/m'),
+  );
 }
