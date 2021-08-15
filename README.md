@@ -1,6 +1,6 @@
 # Nebra Helium Sync Estimate
 
-Monitor progress and estimate time until blockchain sync for Helium Nebra Hotspot Miner
+Monitor progress and estimate time until blockchain sync for Helium Nebra Hotspot Miner. Checks every 2 minutes for updates!
 
 ---
 ## Requirements
