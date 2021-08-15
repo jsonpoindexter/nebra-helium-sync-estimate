@@ -13,6 +13,11 @@ const httpClient = axios.create({
 
 let prevMinedTime; // Last time time height was checked
 let prevMinedHeight;
+let prevBlockHeight;
+let averageMinedPerSecond; // Average mined per second
+let averageAddedPerSecond; // Average added blocks per second
+
+
 // Diagnostic Response API fields mapping
 let diagnosticMapping = {
   BlockHeight: 'BCH',
@@ -33,32 +38,59 @@ const timestamp = () => blue(`[${moment().format()}] `);
 
 // Load saved results from file if they exists
 async function init() {
-  let blockHeight
   if (fs.existsSync(resultsFile)) {
-    console.log(timestamp(), yellow('Reading from existing saved data...'))
-    const data = JSON.parse(await fs.readFileSync(resultsFile))
-    prevMinedHeight = data.prevMinedHeight
-    prevMinedTime = data.prevMinedTime
+    console.log(timestamp(), yellow('Reading from existing saved data...'));
+    ({
+      prevMinedHeight,
+      prevBlockHeight,
+      prevMinedTime,
+      averageAddedPerSecond,
+      averageMinedPerSecond,
+    } = (JSON.parse(await fs.readFileSync(resultsFile))))
   } else {
     const diagnosticResponse = await getDiagnosticsReport()
     prevMinedHeight = diagnosticResponse[diagnosticMapping.MinedHeight]
+    prevBlockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
     prevMinedTime = new Date().getTime()
-    await fs.writeFileSync(resultsFile, JSON.stringify({prevMinedHeight, prevMinedTime}))
+    await saveStats()
   }
+  console.log(timestamp(),
+    yellow('Current Stats: Mined Height:'))
+  console.log(
+    timestamp(),
+    yellow('Mined Height:'),
+    green(prevMinedHeight),
+    yellow('Block Height:'),
+    green(prevBlockHeight),
+  );
+  console.log(
+    timestamp(),
+    yellow('Average Mined Blocks:'),
+    green(averageMinedPerSecond),
+    yellow('/s'),
+    yellow('Average Added Blocks:'),
+    green(averageAddedPerSecond),
+    yellow('/s'),
+  );
 }
 
 async function checkResults() {
   const diagnosticResponse = await getDiagnosticsReport()
   const currentMinedHeight = diagnosticResponse[diagnosticMapping.MinedHeight]
-  const blockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
+  const currentBlockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
   const timeMs = new Date().getTime()
   if (currentMinedHeight !== prevMinedHeight) {
-    const elapseBlocks = currentMinedHeight - prevMinedHeight
-    const remainingBlocks = blockHeight - currentMinedHeight
+    const elapseMinedBlocks = currentMinedHeight - prevMinedHeight
+    const elapseBlockHeight = currentBlockHeight - prevBlockHeight
+    const remainingBlocks = currentBlockHeight - currentMinedHeight
     const elapseTime = timeMs - prevMinedTime  // Elapse time in seconds
-    const blocksPerMinute = ((elapseBlocks / elapseTime) * 1000 * 60).toFixed(2)
+    const blocksMinedPerMinute = ((elapseMinedBlocks / elapseTime) * 1000 * 60).toFixed(2)
+    averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond, (elapseMinedBlocks / elapseTime) * 1000)
+    const blocksAddedPerMinute = ((elapseBlockHeight / elapseTime) * 1000 * 60).toFixed(2) // Blocks being added to height
+    averageAddedPerSecond = approxRollingAverage(averageAddedPerSecond, (elapseBlockHeight / elapseTime) * 1000)
+
     const {days, hours, minutes, seconds} = getTimeRemaining(
-      (elapseTime / elapseBlocks) * remainingBlocks,
+      (elapseTime / (elapseMinedBlocks - elapseBlockHeight)) * remainingBlocks,
     )
     console.log(cyan(`==================== UPDATE ====================`))
 
@@ -73,23 +105,29 @@ async function checkResults() {
     console.log(
       timestamp(),
       yellow('Mined'),
-      green(elapseBlocks.toString()),
+      green(elapseMinedBlocks.toString()),
       yellow('block in'),
       green(Math.round(elapseTime / 1000)),
-      yellow('seconds'),
+      yellow('seconds and '),
+      green(elapseBlockHeight),
+      yellow('blocks added to block height '),
     )
 
     console.log(
       timestamp(),
       yellow(`Current Blocks Left to Mine:`),
-      green(blockHeight - currentMinedHeight),
+      green(currentBlockHeight - currentMinedHeight),
       yellow('['),
       green(currentMinedHeight),
       yellow('/'),
-      green(blockHeight),
+      green(currentBlockHeight),
       yellow(']'),
-      green(blocksPerMinute),
-      yellow('b/m'),
+      green(blocksMinedPerMinute),
+      yellow('b/mpm'),
+      green(blocksAddedPerMinute),
+      yellow('b/apm'),
+      green(Math.abs(blocksAddedPerMinute - blocksMinedPerMinute).toFixed(2)),
+      yellow('Δ'),
     )
     console.log(
       timestamp(),
@@ -97,9 +135,20 @@ async function checkResults() {
       green(`days: ${days}, hours: ${hours}, minutes: ${minutes}, seconds: ${seconds}`),
     )
     prevMinedHeight = currentMinedHeight
+    prevBlockHeight = currentBlockHeight
     prevMinedTime = timeMs
-    await fs.writeFileSync(resultsFile, JSON.stringify({prevMinedHeight, prevMinedTime}))
+    await saveStats()
   }
+}
+
+async function saveStats() {
+  await fs.writeFileSync(resultsFile, JSON.stringify({
+    prevMinedHeight,
+    prevMinedTime,
+    prevBlockHeight,
+    averageAddedPerSecond,
+    averageMinedPerSecond,
+  }))
 }
 
 async function getDiagnosticsReport() {
@@ -121,4 +170,11 @@ function getTimeRemaining(remainingTime) {
     minutes,
     seconds,
   };
+}
+
+const averageOver = 100 // Average over 100 values
+function approxRollingAverage(avg, newValue) {
+  avg -= avg / averageOver
+  avg += newValue / averageOver
+  return avg
 }
