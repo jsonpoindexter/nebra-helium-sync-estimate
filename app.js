@@ -33,7 +33,7 @@ const timestamp = () => blue(`[${moment().format()}] `);
   await checkResults()
   setInterval(async () => {
     await checkResults()
-  }, 1000)
+  }, 120000)
 })();
 
 // Load saved results from file if they exists
@@ -54,8 +54,6 @@ async function init() {
     prevMinedTime = new Date().getTime()
     await saveStats()
   }
-  console.log(timestamp(),
-    yellow('Current Stats: Mined Height:'))
   console.log(
     timestamp(),
     yellow('Mined Height:'),
@@ -77,12 +75,12 @@ async function checkResults() {
     const remainingBlocks = currentBlockHeight - currentMinedHeight
     const elapseTime = timeMs - prevMinedTime  // Elapse time in seconds
     const blocksMinedPerMinute = ((elapseMinedBlocks / elapseTime) * 1000 * 60).toFixed(2)
-    averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond || (elapseMinedBlocks / elapseTime) * 1000 , (elapseMinedBlocks / elapseTime) * 1000)
+    averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond || (elapseMinedBlocks / elapseTime) * 1000, (elapseMinedBlocks / elapseTime) * 1000)
     const blocksAddedPerMinute = ((elapseBlockHeight / elapseTime) * 1000 * 60).toFixed(2) // Blocks being added to height
     averageAddedPerSecond = approxRollingAverage(averageAddedPerSecond || (elapseBlockHeight / elapseTime) * 1000, (elapseBlockHeight / elapseTime) * 1000)
 
     const {days, hours, minutes, seconds} = getTimeRemaining(
-      remainingBlocks / ((averageMinedPerSecond - averageAddedPerSecond) / 1000)
+      remainingBlocks / ((averageMinedPerSecond - averageAddedPerSecond) / 1000),
     )
     console.log(cyan(`==================== UPDATE ====================`))
 
@@ -98,11 +96,11 @@ async function checkResults() {
       timestamp(),
       yellow('Mined'),
       green(elapseMinedBlocks.toString()),
-      yellow('block in'),
-      green(Math.round(elapseTime / 1000)),
-      yellow('seconds and '),
+      yellow('block(s) while'),
       green(elapseBlockHeight),
-      yellow('blocks added to block height '),
+      yellow('block(s)s were added to block height in'),
+      green(Math.round(elapseTime / 1000)),
+      yellow('seconds'),
     )
 
     showTrackedAverages();
@@ -166,7 +164,7 @@ function getTimeRemaining(remainingTime) {
   };
 }
 
-const averageOver = 100 // Average over 100 values
+const averageOver = 10 // Average over 100 values
 function approxRollingAverage(avg, newValue) {
   avg -= avg / averageOver
   avg += newValue / averageOver
@@ -178,9 +176,11 @@ function showTrackedAverages() {
     timestamp(),
     yellow('Average Mined Blocks:'),
     green((averageMinedPerSecond * 60).toFixed(2)),
-    yellow('/m'),
+    yellow('/min'))
+  console.log(
+    timestamp(),
     yellow('Average Added Blocks:'),
     green((averageAddedPerSecond * 60).toFixed(2)),
-    yellow('/m'),
+    yellow('/min'),
   );
 }
