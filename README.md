@@ -55,6 +55,11 @@ In order to run the app you must pass in your Nebra Hotspot's IP address:
 
 ## Results
 ```bash
+$ npm run start 192.168.1.200
+
+> nebra-helium-sync-estimate@1.0.0 start
+> node app.js "192.168.1.200"
+
 ==================== Nebra Helium Miner Sync Estimate ====================
 [2021-08-15T12:08:10-07:00]  Host: 192.168.1.200
 [2021-08-15T12:08:10-07:00]  Reading from existing saved data...
