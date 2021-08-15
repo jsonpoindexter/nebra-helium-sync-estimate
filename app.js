@@ -68,6 +68,8 @@ async function checkResults() {
   const diagnosticResponse = await getDiagnosticsReport()
   const currentMinedHeight = diagnosticResponse[diagnosticMapping.MinedHeight]
   const currentBlockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
+  if (!currentMinedHeight) return console.log(timestamp(), yellow('Miner Is Still Loading...'))
+  if (currentMinedHeight >= currentBlockHeight) return console.log(timestamp(), yellow('Miner Is Synced!'))
   const timeMs = new Date().getTime()
   if (currentMinedHeight !== prevMinedHeight) {
     const elapseMinedBlocks = currentMinedHeight - prevMinedHeight
@@ -94,9 +96,8 @@ async function checkResults() {
 
     console.log(
       timestamp(),
-      yellow('Mined'),
       green(elapseMinedBlocks.toString()),
-      yellow('block(s) while'),
+      yellow('block(s) mined and '),
       green(elapseBlockHeight),
       yellow('block(s)s were added to block height in'),
       green(Math.round(elapseTime / 1000)),
@@ -172,12 +173,12 @@ function approxRollingAverage(avg, newValue) {
 }
 
 function showTrackedAverages() {
-  console.log(
+  averageMinedPerSecond && console.log(
     timestamp(),
     yellow('Average Mined Blocks:'),
     green((averageMinedPerSecond * 60).toFixed(2)),
     yellow('/min'))
-  console.log(
+  averageAddedPerSecond && console.log(
     timestamp(),
     yellow('Average Added Blocks:'),
     green((averageAddedPerSecond * 60).toFixed(2)),
