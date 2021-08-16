@@ -70,7 +70,11 @@ async function checkResults() {
     const currentMinedHeight = diagnosticResponse[diagnosticMapping.MinedHeight]
     const currentBlockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
     if (!currentMinedHeight) return console.log(timestamp(), yellow('Miner Is Still Loading...'))
-    if (currentMinedHeight >= currentBlockHeight) return console.log(timestamp(), yellow('Miner Is Synced!'))
+    if (currentMinedHeight >= currentBlockHeight) return console.log(timestamp(), yellow('Miner Is Synced! ['),
+      green(currentMinedHeight),
+      yellow('/'),
+      green(currentBlockHeight),
+      yellow(']'),)
     const timeMs = new Date().getTime()
     if (currentMinedHeight !== prevMinedHeight) {
       const elapseMinedBlocks = currentMinedHeight - prevMinedHeight
