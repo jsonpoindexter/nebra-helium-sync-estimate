@@ -61,17 +61,17 @@ $ npm run start 192.168.1.200
 > node app.js "192.168.1.200"
 
 ==================== Nebra Helium Miner Sync Estimate ====================
-[2021-08-15T12:08:10-07:00]  Host: 192.168.1.200
-[2021-08-15T12:08:10-07:00]  Reading from existing saved data...
-[2021-08-15T12:08:10-07:00]  Mined Height: 966753 Block Height: 966753
-[2021-08-15T12:08:10-07:00]  Average Mined Blocks: 3.78 /min
-[2021-08-15T12:08:10-07:00]  Average Added Blocks: 1.16 /min
+[2021-08-16T08:11:56-07:00]  Host: 192.168.1.200
+[2021-08-16T08:11:56-07:00]  Mined Height: 967707 Block Height: 967977
 ==================== UPDATE ====================
-[2021-08-15T12:10:30-07:00]  Mined 4 and 6 blocks added to block height  197 in 197 seconds
-[2021-08-15T12:10:30-07:00]  Average Mined Blocks: 3.53 /min
-[2021-08-15T12:10:30-07:00]  Average Added Blocks: 1.23 /min
-[2021-08-15T12:10:30-07:00]  Current Blocks Left to Mine: 2 [ 966757 / 966759 ] 1.22 b/mpm 1.83 b/apm 0.61 Δ
-[2021-08-15T12:10:30-07:00]  Estimated Time Remaining:  days: 0, hours: 0, minutes: 0, seconds: 52
-```
-
-
+[2021-08-16T08:13:56-07:00]  5 block(s) mined and  2 block(s)s were added to block height in 120 seconds
+[2021-08-16T08:13:56-07:00]  Average Mined Blocks: 2.50 /min
+[2021-08-16T08:13:56-07:00]  Average Added Blocks: 1.00 /min
+[2021-08-16T08:13:56-07:00]  Current Blocks Left to Mine: 267 [ 967712 / 967979 ] 2.50 b/mpm 1.00 b/apm 1.50 Δ
+[2021-08-16T08:13:56-07:00]  Estimated Time Remaining:  days: 0, hours: 2, minutes: 58, seconds: 7
+==================== UPDATE ====================
+[2021-08-16T08:15:56-07:00]  8 block(s) mined and  4 block(s)s were added to block height in 120 seconds
+[2021-08-16T08:15:56-07:00]  Average Mined Blocks: 2.65 /min
+[2021-08-16T08:15:56-07:00]  Average Added Blocks: 1.10 /min
+[2021-08-16T08:15:56-07:00]  Current Blocks Left to Mine: 263 [ 967720 / 967983 ] 4.00 b/mpm 2.00 b/apm 2.00 Δ
+[2021-08-16T08:15:56-07:00]  Estimated Time Remaining:  days: 0, hours: 2, minutes: 49, seconds: 47
