@@ -65,73 +65,82 @@ async function init() {
 }
 
 async function checkResults() {
-  const diagnosticResponse = await getDiagnosticsReport()
-  const currentMinedHeight = diagnosticResponse[diagnosticMapping.MinedHeight]
-  const currentBlockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
-  if (!currentMinedHeight) return console.log(timestamp(), yellow('Miner Is Still Loading...'))
-  if (currentMinedHeight >= currentBlockHeight) return console.log(timestamp(), yellow('Miner Is Synced!'))
-  const timeMs = new Date().getTime()
-  if (currentMinedHeight !== prevMinedHeight) {
-    const elapseMinedBlocks = currentMinedHeight - prevMinedHeight
-    const elapseBlockHeight = currentBlockHeight - prevBlockHeight
-    const remainingBlocks = currentBlockHeight - currentMinedHeight
-    const elapseTime = timeMs - prevMinedTime  // Elapse time in seconds
-    const blocksMinedPerMinute = ((elapseMinedBlocks / elapseTime) * 1000 * 60).toFixed(2)
-    averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond || (elapseMinedBlocks / elapseTime) * 1000, (elapseMinedBlocks / elapseTime) * 1000)
-    const blocksAddedPerMinute = ((elapseBlockHeight / elapseTime) * 1000 * 60).toFixed(2) // Blocks being added to height
-    averageAddedPerSecond = approxRollingAverage(averageAddedPerSecond || (elapseBlockHeight / elapseTime) * 1000, (elapseBlockHeight / elapseTime) * 1000)
+  try {
+    const diagnosticResponse = await getDiagnosticsReport()
+    const currentMinedHeight = diagnosticResponse[diagnosticMapping.MinedHeight]
+    const currentBlockHeight = diagnosticResponse[diagnosticMapping.BlockHeight]
+    if (!currentMinedHeight) return console.log(timestamp(), yellow('Miner Is Still Loading...'))
+    if (currentMinedHeight >= currentBlockHeight) return console.log(timestamp(), yellow('Miner Is Synced!'))
+    const timeMs = new Date().getTime()
+    if (currentMinedHeight !== prevMinedHeight) {
+      const elapseMinedBlocks = currentMinedHeight - prevMinedHeight
+      const elapseBlockHeight = currentBlockHeight - prevBlockHeight
+      const remainingBlocks = currentBlockHeight - currentMinedHeight
+      const elapseTime = timeMs - prevMinedTime  // Elapse time in seconds
+      const blocksMinedPerMinute = ((elapseMinedBlocks / elapseTime) * 1000 * 60).toFixed(2)
+      averageMinedPerSecond = approxRollingAverage(averageMinedPerSecond || (elapseMinedBlocks / elapseTime) * 1000, (elapseMinedBlocks / elapseTime) * 1000)
+      const blocksAddedPerMinute = ((elapseBlockHeight / elapseTime) * 1000 * 60).toFixed(2) // Blocks being added to height
+      averageAddedPerSecond = approxRollingAverage(averageAddedPerSecond || (elapseBlockHeight / elapseTime) * 1000, (elapseBlockHeight / elapseTime) * 1000)
 
-    const {days, hours, minutes, seconds} = getTimeRemaining(
-      remainingBlocks / ((averageMinedPerSecond - averageAddedPerSecond) / 1000),
-    )
-    console.log(cyan(`==================== UPDATE ====================`))
+      const {days, hours, minutes, seconds} = getTimeRemaining(
+        remainingBlocks / ((averageMinedPerSecond - averageAddedPerSecond) / 1000),
+      )
+      console.log(cyan(`==================== UPDATE ====================`))
 
-    // console.log(timestamp(),`currentMinedHeight: ${currentMinedHeight}`)
-    // console.log(timestamp(), `blockHeight: ${blockHeight}`)
-    // console.log(timestamp(), 'elapseBlocks: ', elapseBlocks)
-    // console.log(timestamp(), 'remainingBlocks: ', remainingBlocks)
-    // console.log(timestamp(), `timeMs: ${timeMs}`)
-    // console.log(timestamp(), `prevMinedTime: ${prevMinedTime}`)
-    // console.log(timestamp(), 'elapseTime ', elapseTime)
+      // console.log(timestamp(),`currentMinedHeight: ${currentMinedHeight}`)
+      // console.log(timestamp(), `blockHeight: ${blockHeight}`)
+      // console.log(timestamp(), 'elapseBlocks: ', elapseBlocks)
+      // console.log(timestamp(), 'remainingBlocks: ', remainingBlocks)
+      // console.log(timestamp(), `timeMs: ${timeMs}`)
+      // console.log(timestamp(), `prevMinedTime: ${prevMinedTime}`)
+      // console.log(timestamp(), 'elapseTime ', elapseTime)
 
-    console.log(
-      timestamp(),
-      green(elapseMinedBlocks.toString()),
-      yellow('block(s) mined and '),
-      green(elapseBlockHeight),
-      yellow('block(s)s were added to block height in'),
-      green(Math.round(elapseTime / 1000)),
-      yellow('seconds'),
-    )
+      console.log(
+        timestamp(),
+        green(elapseMinedBlocks.toString()),
+        yellow('block(s) mined and '),
+        green(elapseBlockHeight),
+        yellow('block(s)s were added to block height in'),
+        green(Math.round(elapseTime / 1000)),
+        yellow('seconds'),
+      )
 
-    showTrackedAverages();
+      showTrackedAverages();
 
-    console.log(
-      timestamp(),
-      yellow(`Current Blocks Left to Mine:`),
-      green(currentBlockHeight - currentMinedHeight),
-      yellow('['),
-      green(currentMinedHeight),
-      yellow('/'),
-      green(currentBlockHeight),
-      yellow(']'),
-      green(blocksMinedPerMinute),
-      yellow('b/mpm'),
-      green(blocksAddedPerMinute),
-      yellow('b/apm'),
-      green(Math.abs(blocksAddedPerMinute - blocksMinedPerMinute).toFixed(2)),
-      yellow('Δ'),
-    )
-    console.log(
-      timestamp(),
-      yellow(`Estimated Time Remaining: `),
-      green(`days: ${days}, hours: ${hours}, minutes: ${minutes}, seconds: ${seconds}`),
-    )
-    prevMinedHeight = currentMinedHeight
-    prevBlockHeight = currentBlockHeight
-    prevMinedTime = timeMs
-    await saveStats()
+      console.log(
+        timestamp(),
+        yellow(`Current Blocks Left to Mine:`),
+        green(currentBlockHeight - currentMinedHeight),
+        yellow('['),
+        green(currentMinedHeight),
+        yellow('/'),
+        green(currentBlockHeight),
+        yellow(']'),
+        green(blocksMinedPerMinute),
+        yellow('b/mpm'),
+        green(blocksAddedPerMinute),
+        yellow('b/apm'),
+        green(Math.abs(blocksAddedPerMinute - blocksMinedPerMinute).toFixed(2)),
+        yellow('Δ'),
+      )
+      console.log(
+        timestamp(),
+        yellow(`Estimated Time Remaining: `),
+        green(`days: ${days}, hours: ${hours}, minutes: ${minutes}, seconds: ${seconds}`),
+      )
+      prevMinedHeight = currentMinedHeight
+      prevBlockHeight = currentBlockHeight
+      prevMinedTime = timeMs
+      await saveStats()
+    }
+  } catch (e) {
+    if(e.isAxiosError) {
+      console.error(timestamp(), e.message)
+    } else {
+      console.log(timestamp(), e)
+    }
   }
+
 }
 
 async function saveStats() {
