@@ -158,7 +158,7 @@ async function saveStats() {
 }
 
 async function getDiagnosticsReport() {
-  const {data} = (await httpClient.get('/diagnostics.json'))
+  const {data} = (await httpClient.get('/?json=true'))
   data[diagnosticMapping.MinedHeight] = parseInt(data[diagnosticMapping.MinedHeight])
   return data
 }
