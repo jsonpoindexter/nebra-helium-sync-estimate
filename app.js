@@ -6,7 +6,7 @@ const {green, yellow, blue, cyan} = require('colors')
 const axios = require('axios');
 const moment = require('moment')
 const fs = require('fs')
-const resultsFile = 'data.json' // previously saved results
+const resultsFile = 'nebra-diag.json' // previously saved results
 const httpClient = axios.create({
   baseURL: `http://${host}`,
 });
@@ -158,7 +158,7 @@ async function saveStats() {
 }
 
 async function getDiagnosticsReport() {
-  const {data} = (await httpClient.get('/?json=true'))
+  const {data} = (await httpClient.get('/json'))
   data[diagnosticMapping.MinedHeight] = parseInt(data[diagnosticMapping.MinedHeight])
   return data
 }
